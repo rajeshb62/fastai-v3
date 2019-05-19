@@ -12,13 +12,14 @@ from fastai.vision import *
 export_file_url = 'https://www.dropbox.com/s/6bgq8t6yextloqp/export.pkl?raw=1'
 export_file_name = 'export.pkl'
 
-classes = ['black', 'grizzly', 'teddys']
+classes = ['french beans', 'potatoes', 'tomatoes']
 path = Path(__file__).parent
 
 app = Starlette()
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_headers=['X-Requested-With', 'Content-Type'])
 app.mount('/static', StaticFiles(directory='app/static'))
 
+#@asyncio.coroutine
 async def download_file(url, dest):
     if dest.exists(): return
     async with aiohttp.ClientSession() as session:
@@ -26,8 +27,11 @@ async def download_file(url, dest):
             data = await response.read()
             with open(dest, 'wb') as f: f.write(data)
 
+#@asyncio.coroutine
 async def setup_learner():
     await download_file(export_file_url, path/export_file_name)
+    print (export_file_url, path, export_file_name)
+    #defaults.device = torch.device('cpu')
     try:
         learn = load_learner(path, export_file_name)
         return learn
